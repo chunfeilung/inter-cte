@@ -1,0 +1,44 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Departures{% endblock %}
+
+{% block page_contents %}
+    <h2 style="display: none">{{ selected_station ?: 'Select a station' }}</h2>
+    <form method="get" action="/departures">
+        <label for="station">Station</label>
+        <select id="station" name="station">
+            <option name=""></option>
+            {% for station in stations %}
+                <option name="{{ station }}" {{ selected_station == station ? 'selected' : '' }}> {{ station }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Show departures" />
+    </form>
+
+    {% if departures != [] %}
+    <table>
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Destination</th>
+                <th>Platform</th>
+                <th>Train type</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for departure in departures %}
+                <tr>
+                    <td>{{ departure.time }}</td>
+                    <td>{{ departure.headsign }}</td>
+                    <td>{{ departure.platform }}</td>
+                    <td>{{ departure.train_type }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="message">
+            No departure information available.
+        </div>
+    {% endif %}
+{% endblock %}

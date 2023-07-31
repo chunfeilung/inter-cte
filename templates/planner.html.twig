@@ -1,0 +1,219 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Travel planner{% endblock %}
+
+{% block page_style %}
+    <style>
+        .form-row {
+            margin: 1rem 0;
+        }
+
+        input[type="range"] {
+            position: relative;
+            top: .2rem;
+            width: 50%;
+        }
+
+        .advice {
+            color: #003082;
+            text-align: left;
+        }
+
+        .advice ol {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .advice .summary {
+            background-color: #ffc73b;
+            border-top-left-radius: .2rem;
+            border-top-right-radius: .2rem;
+            font-size: 1.2rem;
+            margin-top: 1rem;
+            padding: 1rem;
+        }
+
+        .advice .summary .duration {
+            float: right;
+        }
+
+        .advice .summary .duration:before {
+            content: '⏲ ';
+        }
+
+        .advice .plan {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .advice .plan .stop {
+            background-color: #b9dfed;
+            position: relative;
+        }
+
+        .advice .plan .stop::before {
+            background-color: #ffffff;
+            border: .2rem solid #003082;
+            border-radius: 50%;
+            content: '';
+            display: block;
+            height: .75rem;
+            left: calc(4.5rem);
+            position: absolute;
+            top: .5rem;
+            width: .75rem;
+            z-index: 10;
+        }
+
+        .advice .plan .stop:hover::before {
+            background-color: #ffc73b;
+        }
+
+        .advice .plan li:last-child .stop {
+            border-bottom-left-radius: .2rem;
+            border-bottom-right-radius: .2rem;
+        }
+
+        .advice .plan .time {
+            float: left;
+            width: 3rem;
+        }
+
+        .advice .plan .part {
+            border-left: .2rem solid #003082;
+            margin-left: 5rem;
+        }
+
+        .advice .plan li:first-child .part::before,
+        .advice .plan li:last-child .part::before {
+            border-left: .2rem solid #b9dfed;
+            content: '';
+            display: block;
+            height: 1rem;
+            left: 5rem;
+            position: absolute;
+            top: 0;
+        }
+
+        .advice .plan li:last-child .part::before {
+            top: inherit;
+            bottom: 0;
+        }
+
+        .advice .plan .time,
+        .advice .plan .part,
+        .advice .plan .platform {
+            padding: .5rem 1rem;
+        }
+
+        .advice .plan .station {
+            font-weight: bold;
+        }
+
+        .advice .plan .platform {
+            float: right;
+        }
+
+        .advice .plan .train {
+            color: #333333;
+            padding: 1rem;
+        }
+
+        .advice .plan .transfer_time {
+            font-style: italic;
+        }
+    </style>
+{% endblock %}
+
+{% block page_contents %}
+    <form method="get" action="/">
+        <script>
+            const updateTime = (slider) => {
+                const date = new Date(parseInt(slider.value) * 1000);
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+
+                document.getElementById('selected_time').textContent = `${hours}:${minutes}`;
+            }
+        </script>
+        <div class="form-row">
+            <label for="origin">From</label>
+            <select id="origin" name="from">
+                <option name=""></option>
+                {% for station in stations %}
+                    <option name="{{ station }}" {{ origin == station ? 'selected' : '' }}> {{ station }}</option>
+                {% endfor %}
+            </select>
+            <label for="destination">To</label>
+            <select id="destination" name="to">
+                <option name=""></option>
+                {% for station in stations %}
+                    <option name="{{ station }}" {{ destination == station ? 'selected' : '' }}> {{ station }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-row">
+            <label for="when">Depart at</label>
+            <input type="range" id="when" name="when"
+                   min="{{ range.min }}"
+                   max="{{ range.max }}"
+                   value="{{ range.cur }}"
+                   oninput="updateTime(this)" />
+            <span id="selected_time">{{ range.cur | date('H:i') }}</span>
+        </div>
+        <div class="form-row">
+            <input type="submit" value="Plan" />
+        </div>
+    </form>
+
+    {% if plans %}
+        <section class="advice">
+            <ol>
+                {% for plan in plans %}
+                    <li>
+                        <div class="summary">
+                        {{ plan | first.time }} ➔ {{ plan | last.time }}
+                        <span class="duration">{{ plan | first.duration }}</span>
+                        </div>
+                        <ol class="plan">
+                            {% for part in plan %}
+                                <li>
+                                    {% if part.type == 'Departure' or part.type == 'Arrival' %}
+                                        <div class="stop">
+                                            <div class="time">{{ part.time }}</div>
+                                            <div class="platform">Platform {{ part.platform }}</div>
+                                            <div class="part station">{{ part.station }}</div>
+                                        </div>
+                                    {% elseif part.type == 'Transfer' %}
+                                        <div class="stop">
+                                            <div>
+                                                <div class="time">{{ part.times[0] }}</div>
+                                                <div class="platform">Platform {{ part.platforms[0] }}</div>
+                                                <div class="part station">{{ part.station }}</div>
+                                            </div>
+                                            <div>
+                                                <div class="time">{{ part.times[1] }}</div>
+                                                <div class="platform">Platform {{ part.platforms[1] }}</div>
+                                                <div class="part transfer_time">{{ part.transfer_time }} min. transfer time</div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div>
+                                            <div class="time">&nbsp;</div>
+                                            <div class="part train">{{ part.train_type }} to {{ part.headsign }}</div>
+                                        </div>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ol>
+                    </li>
+                {% endfor %}
+            </ol>
+        </section>
+    {% elseif origin and destination %}
+        <div class="message">
+            No travel advice available.
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Custom query{% endblock %}
+
+{% block page_style %}
+    <style>
+        label,
+        textarea {
+            display: block;
+            width: 100%;
+        }
+
+        textarea {
+            border: 0;
+            border-radius: .2rem;
+            color: #003082;
+            font-size: 1rem;
+            line-height: 1.4;
+            margin-bottom: 1.5rem;
+            min-height: 20rem;
+            padding: .5rem;
+            resize: vertical;
+        }
+
+        .error {
+            color: #ee0000;
+            font-weight: bold;
+            margin: 2rem auto;
+        }
+    </style>
+{% endblock %}
+
+{% block page_contents %}
+    <form method="post" action="/query">
+        <label for="query">Enter a query. Don’t forget to add a <code>LIMIT</code> when you’re querying large tables.</label>
+        <textarea id="query" name="query">{{ query }}</textarea>
+        <input type="submit" value="Execute query" />
+        <input type="submit" name="random" value="I’m feeling lucky" />
+    </form>
+    <form>
+    </form>
+
+    {% if success != true %}
+        <div class="error">
+            {{ result }}
+        </div>
+    {% elseif success == true and result %}
+        <table>
+            <thead>
+                <tr>
+                    {% for key, _ in result[0] %}
+                        <th>{{ key }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in result %}
+                    <tr>
+                        {% for field in row %}
+                            <td>{{ field }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% elseif success and query is not empty %}
+        <div class="message">
+            Query returned no results.
+        </div>
+    {% endif %}
+{% endblock %}

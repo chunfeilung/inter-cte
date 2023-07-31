@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    volumes:
+      - .:/var/www/html
+    environment:
+      - APP_ENV=dev
+      - DATABASE_URL=mysql://root:root_password@db/inter_cte
+    ports:
+      - '8000:8000'
+    depends_on:
+      - db
+    working_dir: /var/www/html
+
+  db:
+    image: mariadb:10.6
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_DATABASE=inter_cte
+      - TZ=Europe/Amsterdam
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:

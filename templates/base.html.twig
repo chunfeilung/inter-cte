@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Planner{% endblock %} | Inter-CTE</title>
+        <style>
+            :root {
+                --yellow: #ffd943;
+                --blue: #008fd8;
+            }
+
+            html {
+                font-family: system-ui, sans-serif;
+                margin: 0;
+                padding: 0;
+                text-align: center;
+            }
+
+            body {
+                display: grid;
+                grid-template-rows: auto 1fr auto;
+                margin: 0 auto;
+                max-width: 60rem;
+                min-height: 100vh;
+            }
+
+            h1 img {
+                max-width: 75%;
+            }
+
+            nav,
+            .message {
+                margin: 2rem;
+            }
+
+            nav ul {
+                list-style-type: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            nav li {
+                display: inline-block;
+            }
+
+            nav a {
+                border-radius: .2rem;
+                color: #000000;
+                font-size: 1.2rem;
+                font-weight: bold;
+                margin: 0 .25rem;
+                padding: .5rem 1rem;
+                text-decoration: none;
+            }
+
+            nav a:hover {
+                background-color: var(--yellow);
+            }
+
+            form {
+                background-color: var(--yellow);
+                border-radius: .2rem;
+                padding: 1.5rem 2rem;
+            }
+
+            input:not([type="range"]),
+            label,
+            select {
+                border: 0;
+                border-radius: .2rem;
+                font-size: 1rem;
+                margin: .5rem 0;
+                padding: .5rem;
+            }
+
+            select {
+                color: #003082;
+                font-weight: bold;
+            }
+
+            input[type="submit"] {
+                background-color: var(--blue);
+                color: #ffffff;
+                cursor: pointer;
+                margin: .5rem 1rem;
+                padding: .58rem 2rem;
+            }
+
+            input[type="submit"]:hover {
+                background-color: #005fc4;
+            }
+
+            table {
+                border-collapse: collapse;
+                color: #003082;
+                margin: 2rem 0;
+                width: 100%;
+            }
+
+            tr:nth-child(2n+1) {
+                background-color: #ffffff;
+            }
+
+            th,
+            tr:nth-child(2n) {
+                background-color: #b9dfed;
+            }
+
+            th,
+            td {
+                padding: .5rem;
+                text-align: left;
+            }
+
+            footer {
+                margin: 4rem .5rem 2rem;
+            }
+        </style>
+        {% block page_style %}{% endblock %}
+    </head>
+    <header>
+        <h1>
+            <img src="/inter-cte.svg" alt="Inter-CTE" />
+        </h1>
+
+        <nav>
+            <ul>
+                <li><a href="/">Planner</a></li>
+                <li><a href="/departures">Departures</a></li>
+                <li><a href="/query">Query</a></li>
+            </ul>
+        </nav>
+    </header>
+    <body>
+        {% block content %}{% endblock %}
+    </body>
+    <footer>
+        Created by <a href="https://chuniversiteit.nl">Chuniversiteit</a> for
+        seemingly no reason
+    </footer>
+</html>
